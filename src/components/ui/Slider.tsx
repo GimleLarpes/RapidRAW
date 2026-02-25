@@ -10,7 +10,9 @@ interface SliderProps {
   onDragStateChange?(state: boolean): void;
   step: number;
   value: number;
+  className?: string;
   trackClassName?: string;
+  disabled?: boolean;
 }
 
 const DOUBLE_CLICK_THRESHOLD_MS = 300;
@@ -24,7 +26,9 @@ const Slider = ({
   onDragStateChange = () => {},
   step,
   value,
+  className = '',
   trackClassName,
+  disabled = false,
 }: SliderProps) => {
   const [displayValue, setDisplayValue] = useState<number>(value);
   const [isDragging, setIsDragging] = useState(false);
@@ -45,6 +49,7 @@ const Slider = ({
     if (!sliderElement) return;
 
     const handleWheel = (event: WheelEvent) => {
+      if (disabled) return;
       if (!event.shiftKey) {
         return;
       }
@@ -145,6 +150,7 @@ const Slider = ({
   }, [isEditing]);
 
   const handleReset = () => {
+    if (disabled) return;
     const syntheticEvent = {
       target: {
         value: defaultValue,
@@ -159,6 +165,7 @@ const Slider = ({
   };
 
   const handleDragStart = (e: React.MouseEvent<HTMLInputElement>) => {
+    if (disabled) return;
     if (Date.now() - lastUpTime.current < DOUBLE_CLICK_THRESHOLD_MS) {
       e.preventDefault();
       return;
@@ -172,6 +179,7 @@ const Slider = ({
   };
 
   const handleValueClick = () => {
+    if (disabled) return;
     setIsEditing(true);
   };
 
@@ -223,14 +231,14 @@ const Slider = ({
   const numericValue = isNaN(Number(value)) ? 0 : Number(value);
 
   return (
-    <div className="mb-2 group" ref={containerRef}>
+    <div className={`mb-2 group ${className} ${disabled ? 'opacity-50' : ''}`} ref={containerRef}>
       <div className="flex justify-between items-center mb-1">
         <div
-          className={`grid ${typeof label === 'string' ? 'cursor-pointer' : ''}`}
-          onClick={typeof label === 'string' ? handleReset : undefined}
-          onDoubleClick={typeof label === 'string' ? handleReset : undefined}
-          onMouseEnter={typeof label === 'string' ? () => setIsLabelHovered(true) : undefined}
-          onMouseLeave={typeof label === 'string' ? () => setIsLabelHovered(false) : undefined}
+          className={`grid ${!disabled && typeof label === 'string' ? 'cursor-pointer' : ''}`}
+          onClick={!disabled && typeof label === 'string' ? handleReset : undefined}
+          onDoubleClick={!disabled && typeof label === 'string' ? handleReset : undefined}
+          onMouseEnter={!disabled && typeof label === 'string' ? () => setIsLabelHovered(true) : undefined}
+          onMouseLeave={!disabled && typeof label === 'string' ? () => setIsLabelHovered(false) : undefined}
         >
           <span
             aria-hidden={isLabelHovered && typeof label === 'string'}
@@ -255,7 +263,7 @@ const Slider = ({
         <div className="w-12 text-right">
           {isEditing ? (
             <input
-              className="w-full text-sm text-right bg-card-active border border-gray-500 rounded px-1 py-0 outline-none focus:ring-1 focus:ring-blue-500 text-text-primary"
+              className="w-full text-sm text-right bg-card-active border border-gray-500 rounded px-1 py-0 outline-none focus:ring-1 focus:ring-blue-500 text-text-primary disabled:cursor-not-allowed"
               max={max}
               min={min}
               onBlur={handleInputCommit}
@@ -265,13 +273,14 @@ const Slider = ({
               step={step}
               type="number"
               value={inputValue}
+              disabled={disabled}
             />
           ) : (
             <span
-              className="text-sm text-text-primary w-full text-right select-none cursor-text"
+              className={`text-sm text-text-primary w-full text-right select-none ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
               onClick={handleValueClick}
               onDoubleClick={handleReset}
-              data-tooltip={`Click to edit`}
+              data-tooltip={disabled ? null : `Click to edit`}
             >
               {decimalPlaces > 0 && numericValue === 0 ? '0' : numericValue.toFixed(decimalPlaces)}
             </span>
@@ -286,7 +295,7 @@ const Slider = ({
           }`}
         />
         <input
-          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent cursor-pointer m-0 p-0 slider-input z-10 ${
+          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} m-0 p-0 slider-input z-10 ${
             isDragging ? 'slider-thumb-active' : ''
           }`}
           style={{ margin: 0 }}
@@ -302,6 +311,7 @@ const Slider = ({
           step={String(step)}
           type="range"
           value={displayValue}
+          disabled={disabled}
         />
       </div>
     </div>

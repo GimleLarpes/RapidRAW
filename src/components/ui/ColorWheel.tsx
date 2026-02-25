@@ -157,18 +157,17 @@ const ColorWheel = ({
         )}
       </div>
 
-      <div className="w-full">
-        <Slider
-          defaultValue={defaultValue.luminance}
-          label={<Sun size={16} className="text-text-secondary" />}
-          max={100}
-          min={-100}
-          onChange={handleLumChange}
-          onDragStateChange={setIsSliderDragging}
-          step={1}
-          value={luminance}
-        />
-      </div>
+      <Slider
+        defaultValue={defaultValue.luminance}
+        label={<Sun size={16} className="text-text-secondary" />}
+        max={100}
+        min={-100}
+        onChange={handleLumChange}
+        onDragStateChange={setIsSliderDragging}
+        step={1}
+        value={luminance}
+        className="w-full"
+      />
     </div>
   );
 };

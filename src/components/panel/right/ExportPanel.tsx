@@ -476,17 +476,16 @@ export default function ExportPanel({
                 ))}
               </div>
               {fileFormat === FileFormats.Jpeg && (
-                <div className={isExporting ? 'opacity-50 pointer-events-none' : ''}>
-                  <Slider
-                    defaultValue={90}
-                    label="Quality"
-                    max={100}
-                    min={1}
-                    onChange={(e) => setJpegQuality(parseInt(e.target.value))}
-                    step={1}
-                    value={jpegQuality}
-                  />
-                </div>
+                <Slider
+                  defaultValue={90}
+                  label="Quality"
+                  max={100}
+                  min={1}
+                  onChange={(e) => setJpegQuality(parseInt(e.target.value))}
+                  step={1}
+                  value={jpegQuality}
+                  disabled={isExporting}
+                />
               )}
             </Section>
 

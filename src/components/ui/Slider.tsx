@@ -3,7 +3,7 @@ import { GLOBAL_KEYS } from './AppProperties';
 
 interface SliderProps {
   defaultValue?: number;
-  label: any;
+  label: string | React.ReactNode;
   max: number;
   min: number;
   onChange(event: any): void;
@@ -32,10 +32,10 @@ const Slider = ({
 }: SliderProps) => {
   const [displayValue, setDisplayValue] = useState<number>(value);
   const [isDragging, setIsDragging] = useState(false);
-  const animationFrameRef = useRef<any>(undefined);
+  const animationFrameRef = useRef<number>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState<string>(String(value));
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastUpTime = useRef(0);
 
@@ -48,10 +48,7 @@ const Slider = ({
     if (!sliderElement) return;
 
     const handleWheel = (event: WheelEvent) => {
-      if (disabled) return;
-      if (!event.shiftKey) {
-        return;
-      }
+      if (disabled || !event.shiftKey) return;
 
       event.preventDefault();
       const direction = -Math.sign(event.deltaY);

@@ -231,32 +231,29 @@ const Slider = ({
   const numericValue = isNaN(Number(value)) ? 0 : Number(value);
 
   return (
-    <div className={`mb-2 group ${className} ${disabled ? 'opacity-50' : ''}`} ref={containerRef}>
+    <div className={`mb-2 ${className} ${disabled ? 'opacity-50' : ''}`} ref={containerRef}>
       <div className="flex justify-between items-center mb-1">
-        <div
-          className={`grid ${!disabled ? 'cursor-pointer' : ''}`}
-          onClick={!disabled ? handleReset : undefined}
-          onDoubleClick={!disabled ? handleReset : undefined}
-          onMouseEnter={!disabled ? () => setIsLabelHovered(true) : undefined}
-          onMouseLeave={!disabled ? () => setIsLabelHovered(false) : undefined}
+        <button
+          type="button"
+          className="grid group/label justify-items-start disabled:cursor-not-allowed"
+          aria-label={`Reset ${label}`}
+          disabled={disabled}
+          onClick={handleReset}
+          onDoubleClick={handleReset}
         >
           <span
-            aria-hidden={isLabelHovered}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-secondary select-none transition-opacity duration-200 ease-in-out ${
-              isLabelHovered ? 'opacity-0' : 'opacity-100'
-            }`}
+            aria-hidden={true}
+            className={`col-start-1 row-start-1 text-sm font-medium text-text-secondary select-none transition-opacity duration-200 ease-in-out opacity-100 ${disabled ? '' : 'group-hover/label:opacity-0'}`}
           >
             {label}
           </span>
           <span
-            aria-hidden={!isLabelHovered}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out ${
-              isLabelHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            aria-hidden={true}
+            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled ? '' : 'group-hover/label:opacity-100'}`}
           >
             Reset
           </span>
-        </div>
+        </button>
         <div className="w-12 text-right">
           {isEditing ? (
             <input

@@ -13,7 +13,7 @@ interface SliderProps {
   min: number;
   step: number;
   value: number;
-  onChange(event: SyntheticEvent): void;
+  onChange(val: number): void;
   onDragStateChange?(state: boolean): void;
   className?: string;
   trackClassName?: string;
@@ -48,13 +48,6 @@ const Slider = ({
     return stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
   }, [step])
 
-  const triggerChange = (value: number) => {
-    const syntheticEvent: SyntheticEvent = {
-      target: { value: value }
-    }
-    onChange(syntheticEvent);
-  };
-
   useEffect(() => {
     onDragStateChange(isDragging);
   }, [isDragging]);
@@ -79,7 +72,7 @@ const Slider = ({
       const clampedValue = Math.max(min, Math.min(max, parseFloat(newValue.toFixed(decimalPlaces))));
 
       if (clampedValue !== value && !isNaN(clampedValue)) {
-        triggerChange(clampedValue);
+        onChange(clampedValue);
       }
     };
 
@@ -147,13 +140,13 @@ const Slider = ({
   }, [value, isDragging]);
 
   const handleReset = () => {
-    triggerChange(defaultValue);
+    onChange(defaultValue);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.valueAsNumber;
     setDisplayValue(val);
-    triggerChange(val)
+    onChange(val)
   };
 
   const handleDragStart = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
@@ -181,7 +174,7 @@ const Slider = ({
       newValue = Math.max(min, Math.min(max, parseFloat(newValue.toFixed(decimalPlaces))));
     }
 
-    triggerChange(newValue);
+    onChange(newValue);
     setIsEditing(false);
     setInputValue(String(value));
   };

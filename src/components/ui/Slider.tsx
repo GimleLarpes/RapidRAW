@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { GLOBAL_KEYS } from './AppProperties';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 interface SyntheticEvent {
   target: {
@@ -45,10 +44,10 @@ const Slider = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const lastUpTime = useRef(0);
 
-  const getDecimalPlaces = (step: number) => {
+  const decimalPlaces = useMemo(() => {
     const stepStr = String(step);
     return stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
-  };
+  }, [step])
 
   const triggerChange = (value: number) => {
     const syntheticEvent: SyntheticEvent = {
@@ -69,9 +68,9 @@ const Slider = ({
       if (disabled || !event.shiftKey) return;
 
       event.preventDefault();
-      const direction = -Math.sign(event.deltaY);
+      const direction = -Math.sign(event.deltaX);
       const newValue = value + direction * step * 2;
-      const roundedNewValue = parseFloat(newValue.toFixed(getDecimalPlaces(step)));
+      const roundedNewValue = parseFloat(newValue.toFixed(decimalPlaces));
 
       const clampedValue = Math.max(min, Math.min(max, roundedNewValue));
 
@@ -85,7 +84,7 @@ const Slider = ({
     return () => {
       sliderElement.removeEventListener('wheel', handleWheel);
     };
-  }, [value, min, max, step, onChange]);
+  }, [value, min, max, step, onChange, decimalPlaces]);
 
   useEffect(() => {
     const handleDragEndGlobal = () => {
@@ -212,40 +211,30 @@ const Slider = ({
     }
   };
 
-  const handleRangeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.currentTarget.blur();
-      return;
-    }
-
-    if (GLOBAL_KEYS.includes(e.key)) {
-      e.currentTarget.blur();
-    }
-  };
-
-  const decimalPlaces = getDecimalPlaces(step);
   const numericValue = isNaN(Number(value)) ? 0 : Number(value);
+  const textLabel = typeof label === 'string';
 
   return (
     <div className={`mb-2 ${className} ${disabled ? 'opacity-50' : ''}`} ref={containerRef}>
       <div className="flex justify-between items-center mb-1">
         <button
           type="button"
-          className="grid group/label justify-items-start disabled:cursor-not-allowed"
-          aria-label={`Reset ${label}`}
-          disabled={disabled}
+          className={`grid group/label justify-items-start ${textLabel ? (disabled ? 'disabled:cursor-not-allowed' : 'cursor-pointer') : 'cursor-default'}`}
+          aria-label={textLabel ? `Reset ${label}` : undefined}
+          aria-hidden={!textLabel}
+          disabled={disabled || !textLabel}
           onClick={handleReset}
           onDoubleClick={handleReset}
         >
           <span
             aria-hidden={true}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-secondary select-none transition-opacity duration-200 ease-in-out opacity-100 ${disabled ? '' : 'group-hover/label:opacity-0'}`}
+            className={`col-start-1 row-start-1 text-sm font-medium text-text-secondary select-none transition-opacity duration-200 ease-in-out opacity-100 ${disabled || !textLabel ? '' : 'group-hover/label:opacity-0'}`}
           >
             {label}
           </span>
           <span
             aria-hidden={true}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled ? '' : 'group-hover/label:opacity-100'}`}
+            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled || !textLabel? '' : 'group-hover/label:opacity-100'}`}
           >
             Reset
           </span>
@@ -259,7 +248,6 @@ const Slider = ({
               onBlur={handleInputCommit}
               onChange={handleInputChange}
               onKeyDown={handleInputKeyDown}
-              ref={inputRef}
               step={step}
               type="number"
               value={inputValue}
@@ -268,8 +256,7 @@ const Slider = ({
           ) : (
             <span
               className={`text-sm text-text-primary w-full text-right select-none ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
-              onClick={handleValueClick}
-              onDoubleClick={handleReset}
+              onClick={(handleValueClick)}
               data-tooltip={disabled ? null : `Click to edit`}
             >
               {decimalPlaces > 0 && numericValue === 0 ? '0' : numericValue.toFixed(decimalPlaces)}
@@ -291,14 +278,11 @@ const Slider = ({
           min={String(min)}
           onChange={handleChange}
           onDoubleClick={handleReset}
-          onKeyDown={handleRangeKeyDown}
-          onMouseDown={handleDragStart}
-          onMouseUp={handleDragEnd}
-          onTouchEnd={handleDragEnd}
-          onTouchStart={handleDragStart}
+          onPointerDown={handleDragStart}
+          onPointerUp={handleDragEnd}
           step={String(step)}
           type="range"
-          value={displayValue}
+          value={value}
           disabled={disabled}
         />
       </div>

@@ -63,7 +63,7 @@ const Slider = ({
     if (!isEditing) {
       setInputValue(String(value));
     }
-  }, [value, decimalPlaces]);
+  }, [value, isEditing, decimalPlaces]);
 
   // Handle scroll
   useEffect(() => {
@@ -88,7 +88,7 @@ const Slider = ({
     return () => {
       sliderElement.removeEventListener('wheel', handleWheel);
     };
-  }, [min, max, step, onChange, decimalPlaces]);
+  }, [value, min, max, step, onChange, decimalPlaces]);
 
   // Handle dragging
   useEffect(() => {
@@ -156,7 +156,6 @@ const Slider = ({
   };
 
   const handleDragStart = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
-    if (disabled) return;
     if (Date.now() - lastUpTime.current < DOUBLE_CLICK_THRESHOLD_MS) {
       e.preventDefault();
       return;
@@ -178,11 +177,12 @@ const Slider = ({
     if (isNaN(newValue)) {
       newValue = value;
     } else {
-      newValue = Math.max(min, Math.min(max, newValue));
+      newValue = Math.max(min, Math.min(max, parseFloat(newValue.toFixed(decimalPlaces))));
     }
 
     triggerChange(newValue);
     setIsEditing(false);
+    setInputValue(String(value));
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

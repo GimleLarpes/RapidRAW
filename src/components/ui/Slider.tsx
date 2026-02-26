@@ -11,10 +11,10 @@ interface SliderProps {
   label: string | React.ReactNode;
   max: number;
   min: number;
-  onChange(event: React.ChangeEvent<HTMLInputElement> | SyntheticEvent): void;
-  onDragStateChange?(state: boolean): void;
   step: number;
   value: number;
+  onChange(event: SyntheticEvent): void;
+  onDragStateChange?(state: boolean): void;
   className?: string;
   trackClassName?: string;
   disabled?: boolean;
@@ -27,10 +27,10 @@ const Slider = ({
   label,
   max,
   min,
-  onChange,
-  onDragStateChange = () => {},
   step,
   value,
+  onChange,
+  onDragStateChange = () => {},
   className = '',
   trackClassName,
   disabled = false,
@@ -151,8 +151,9 @@ const Slider = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDisplayValue(Number(e.target.value));
-    onChange(e);
+    const val = e.target.valueAsNumber;
+    setDisplayValue(val);
+    triggerChange(val)
   };
 
   const handleDragStart = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
@@ -208,7 +209,6 @@ const Slider = ({
           aria-hidden={!textLabel}
           disabled={disabled || !textLabel}
           onClick={handleReset}
-          onDoubleClick={handleReset}
         >
           <span
             aria-hidden={true}

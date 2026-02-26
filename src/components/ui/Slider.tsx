@@ -40,7 +40,6 @@ const Slider = ({
   const animationFrameRef = useRef<number>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState<string>(String(value));
-  const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastUpTime = useRef(0);
 
@@ -60,6 +59,12 @@ const Slider = ({
     onDragStateChange(isDragging);
   }, [isDragging]);
 
+  useEffect(() => {
+    if (!isEditing) {
+      setInputValue(String(value));
+    }
+  }, [value, decimalPlaces]);
+
   // Handle scroll
   useEffect(() => {
     const sliderElement = containerRef.current;
@@ -71,9 +76,7 @@ const Slider = ({
       event.preventDefault();
       const direction = -Math.sign(event.deltaX);
       const newValue = value + direction * step * 5;
-      const roundedNewValue = parseFloat(newValue.toFixed(decimalPlaces));
-
-      const clampedValue = Math.max(min, Math.min(max, roundedNewValue));
+      const clampedValue = Math.max(min, Math.min(max, parseFloat(newValue.toFixed(decimalPlaces))));
 
       if (clampedValue !== value && !isNaN(clampedValue)) {
         triggerChange(clampedValue);
@@ -143,22 +146,7 @@ const Slider = ({
     };
   }, [value, isDragging]);
 
-  // Hanldlers for esc-exit, clicking on input label (can prob be simplified away)
-  useEffect(() => {
-    if (!isEditing) {
-      setInputValue(String(value));
-    }
-  }, [isEditing]);
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    }
-  }, [isEditing]);
-
   const handleReset = () => {
-    if (disabled) return;
     triggerChange(defaultValue);
   };
 
@@ -179,11 +167,6 @@ const Slider = ({
   const handleDragEnd = () => {
     lastUpTime.current = Date.now();
     setIsDragging(false);
-  };
-
-  const handleValueClick = () => {
-    if (disabled) return;
-    setIsEditing(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,7 +196,6 @@ const Slider = ({
     }
   };
 
-  const numericValue = isNaN(Number(value)) ? 0 : Number(value);
   const textLabel = typeof label === 'string';
 
   return (
@@ -242,28 +224,25 @@ const Slider = ({
           </span>
         </button>
         <div className="w-12 text-right">
-          {isEditing ? (
-            <input
-              className="w-full text-sm text-right bg-card-active border border-gray-500 rounded px-1 py-0 outline-none focus:ring-1 focus:ring-blue-500 text-text-primary disabled:cursor-not-allowed"
-              max={max}
-              min={min}
-              onBlur={handleInputCommit}
-              onChange={handleInputChange}
-              onKeyDown={handleInputKeyDown}
-              step={step}
-              type="number"
-              value={inputValue}
-              disabled={disabled}
-            />
-          ) : (
-            <span
-              className={`text-sm text-text-primary w-full text-right select-none ${disabled ? 'cursor-not-allowed' : 'cursor-text'}`}
-              onClick={(handleValueClick)}
-              data-tooltip={disabled ? null : `Click to edit`}
-            >
-              {decimalPlaces > 0 && numericValue === 0 ? '0' : numericValue.toFixed(decimalPlaces)}
-            </span>
-          )}
+          <input
+            className={`w-full text-sm text-text-primary border transition-all duration-200 disabled:cursor-not-allowed 
+              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none 
+              ${isEditing
+                ? 'text-center bg-card-active border-gray-500 rounded px-1 py-0 outline-none focus:ring-1 focus:ring-blue-500 '
+                : 'text-right bg-transparent border-transparent select-none'
+            }`}
+            max={max}
+            min={min}
+            onBlur={handleInputCommit}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            onFocus={() => !disabled && setIsEditing(true)}
+            step={step}
+            type="number"
+            value={isEditing ? inputValue :decimalPlaces > 0 && value === 0 ? '0' : value.toFixed(decimalPlaces)}
+            disabled={disabled}
+            data-tooltip={disabled ? null : `Click to edit`}
+          />
         </div>
       </div>
 
@@ -274,7 +253,10 @@ const Slider = ({
           }`}
         />
         <input
-          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent m-0 p-0 slider-input z-10 ${isDragging ? 'slider-thumb-active' : ''} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent m-0 p-0 slider-input z-10 
+            ${isDragging ? 'slider-thumb-active' : ''} 
+            ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+          `}
           style={{ margin: 0 }}
           max={String(max)}
           min={String(min)}
@@ -284,7 +266,7 @@ const Slider = ({
           onPointerUp={handleDragEnd}
           step={String(step)}
           type="range"
-          value={value}
+          value={isDragging ? value : displayValue}
           disabled={disabled}
         />
       </div>

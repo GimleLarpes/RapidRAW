@@ -60,6 +60,7 @@ const Slider = ({
     onDragStateChange(isDragging);
   }, [isDragging]);
 
+  // Handle scroll
   useEffect(() => {
     const sliderElement = containerRef.current;
     if (!sliderElement) return;
@@ -69,7 +70,7 @@ const Slider = ({
 
       event.preventDefault();
       const direction = -Math.sign(event.deltaX);
-      const newValue = value + direction * step * 2;
+      const newValue = value + direction * step * 5;
       const roundedNewValue = parseFloat(newValue.toFixed(decimalPlaces));
 
       const clampedValue = Math.max(min, Math.min(max, roundedNewValue));
@@ -84,24 +85,24 @@ const Slider = ({
     return () => {
       sliderElement.removeEventListener('wheel', handleWheel);
     };
-  }, [value, min, max, step, onChange, decimalPlaces]);
+  }, [min, max, step, onChange, decimalPlaces]);
 
+  // Handle dragging
   useEffect(() => {
     const handleDragEndGlobal = () => {
       setIsDragging(false);
     };
 
     if (isDragging) {
-      window.addEventListener('mouseup', handleDragEndGlobal);
-      window.addEventListener('touchend', handleDragEndGlobal);
+      window.addEventListener('pointerup', handleDragEndGlobal);
     }
 
     return () => {
-      window.removeEventListener('mouseup', handleDragEndGlobal);
-      window.removeEventListener('touchend', handleDragEndGlobal);
+      window.removeEventListener('pointerup', handleDragEndGlobal);
     };
   }, [isDragging]);
 
+  // Handle animation
   useEffect(() => {
     if (isDragging) {
       if (animationFrameRef.current) {
@@ -142,6 +143,7 @@ const Slider = ({
     };
   }, [value, isDragging]);
 
+  // Hanldlers for esc-exit, clicking on input label (can prob be simplified away)
   useEffect(() => {
     if (!isEditing) {
       setInputValue(String(value));

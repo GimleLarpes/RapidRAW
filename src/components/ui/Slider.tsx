@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GLOBAL_KEYS } from './AppProperties';
 
+interface SyntheticEvent {
+  target: {
+    value: number;
+  };
+}
+
 interface SliderProps {
   defaultValue?: number;
   label: string | React.ReactNode;
   max: number;
   min: number;
-  onChange(event: any): void;
+  onChange(event: React.ChangeEvent<HTMLInputElement> | SyntheticEvent): void;
   onDragStateChange?(state: boolean): void;
   step: number;
   value: number;
@@ -39,9 +45,21 @@ const Slider = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const lastUpTime = useRef(0);
 
+  const getDecimalPlaces = (step: number) => {
+    const stepStr = String(step);
+    return stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
+  };
+
+  const triggerChange = (value: number) => {
+    const syntheticEvent: SyntheticEvent = {
+      target: { value: value }
+    }
+    onChange(syntheticEvent);
+  };
+
   useEffect(() => {
     onDragStateChange(isDragging);
-  }, [isDragging, onDragStateChange]);
+  }, [isDragging]);
 
   useEffect(() => {
     const sliderElement = containerRef.current;
@@ -53,19 +71,12 @@ const Slider = ({
       event.preventDefault();
       const direction = -Math.sign(event.deltaY);
       const newValue = value + direction * step * 2;
-      const stepStr = String(step);
-      const decimalPlaces = stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
-      const roundedNewValue = parseFloat(newValue.toFixed(decimalPlaces));
+      const roundedNewValue = parseFloat(newValue.toFixed(getDecimalPlaces(step)));
 
       const clampedValue = Math.max(min, Math.min(max, roundedNewValue));
 
       if (clampedValue !== value && !isNaN(clampedValue)) {
-        const syntheticEvent = {
-          target: {
-            value: clampedValue,
-          },
-        };
-        onChange(syntheticEvent);
+        triggerChange(clampedValue);
       }
     };
 
@@ -103,11 +114,11 @@ const Slider = ({
     const startValue = displayValue;
     const endValue = value;
     const duration = 300;
-    let startTime: any = null;
+    let startTime: number | null = null;
 
     const easeInOut = (t: number) => t * t * (3 - 2 * t);
 
-    const animate = (timestamp: any) => {
+    const animate = (timestamp: number) => {
       if (!startTime) {
         startTime = timestamp;
       }
@@ -136,7 +147,7 @@ const Slider = ({
     if (!isEditing) {
       setInputValue(String(value));
     }
-  }, [value, isEditing]);
+  }, [isEditing]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -147,12 +158,7 @@ const Slider = ({
 
   const handleReset = () => {
     if (disabled) return;
-    const syntheticEvent = {
-      target: {
-        value: defaultValue,
-      },
-    };
-    onChange(syntheticEvent);
+    triggerChange(defaultValue);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +166,7 @@ const Slider = ({
     onChange(e);
   };
 
-  const handleDragStart = (e: React.MouseEvent<HTMLInputElement>) => {
+  const handleDragStart = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
     if (disabled) return;
     if (Date.now() - lastUpTime.current < DOUBLE_CLICK_THRESHOLD_MS) {
       e.preventDefault();
@@ -191,12 +197,7 @@ const Slider = ({
       newValue = Math.max(min, Math.min(max, newValue));
     }
 
-    const syntheticEvent = {
-      target: {
-        value: newValue,
-      },
-    };
-    onChange(syntheticEvent);
+    triggerChange(newValue);
     setIsEditing(false);
   };
 
@@ -222,8 +223,7 @@ const Slider = ({
     }
   };
 
-  const stepStr = String(step);
-  const decimalPlaces = stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
+  const decimalPlaces = getDecimalPlaces(step);
   const numericValue = isNaN(Number(value)) ? 0 : Number(value);
 
   return (
@@ -285,9 +285,7 @@ const Slider = ({
           }`}
         />
         <input
-          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} m-0 p-0 slider-input z-10 ${
-            isDragging ? 'slider-thumb-active' : ''
-          }`}
+          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent m-0 p-0 slider-input z-10 ${isDragging ? 'slider-thumb-active' : ''} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
           style={{ margin: 0 }}
           max={String(max)}
           min={String(min)}

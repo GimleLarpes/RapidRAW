@@ -2419,9 +2419,13 @@ function App() {
       invoke(Invokes.GenerateFullscreenPreview, {
         jsAdjustments: currentAdjustments,
       })
-        .then(() => {
-          fullResCacheKeyRef.current = key;
+        .then((imageData: Uint8Array) => {
           if (!request.cancelled) {
+            const blob = new Blob([imageData], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            setFullResolutionUrl(url);
+            fullResCacheKeyRef.current = key;
+            setIsFullResolution(true);
             setIsLoadingFullRes(false);
           }
         })

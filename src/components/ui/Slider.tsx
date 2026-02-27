@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
-interface SyntheticEvent {
-  target: {
-    value: number;
-  };
-}
-
 interface SliderProps {
   defaultValue?: number;
   label: string | React.ReactNode;

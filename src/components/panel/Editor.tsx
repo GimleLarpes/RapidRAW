@@ -204,6 +204,37 @@ export default function Editor({
     }, animationTime + 50);
   }, [targetZoom, transformWrapperRef]);
 
+  useEffect(() => {
+    isTransitioningRef.current = true;
+    const timer = setTimeout(() => {
+      isTransitioningRef.current = false;
+
+      const wrapper = transformWrapperRef.current;
+      if (!wrapper?.instance) return;
+
+      const state = wrapper.instance.transformState;
+      if (state.scale <= 1.01) return;
+
+      const wrapperEl = wrapper.instance.wrapperComponent;
+      const contentEl = wrapper.instance.contentComponent;
+      if (!wrapperEl || !contentEl) return;
+
+      const ww = wrapperEl.offsetWidth;
+      const wh = wrapperEl.offsetHeight;
+      const cw = contentEl.offsetWidth;
+      const ch = contentEl.offsetHeight;
+
+      const targetPosX = ww / 2 - focalPointRef.current.x * cw * state.scale;
+      const targetPosY = wh / 2 - focalPointRef.current.y * ch * state.scale;
+
+      if (Math.abs(state.positionX - targetPosX) > 5 || Math.abs(state.positionY - targetPosY) > 5) {
+        wrapper.setTransform(targetPosX, targetPosY, state.scale, 250, 'easeOut');
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [isFullScreen, transformWrapperRef]);
+
   const handleTransform = useCallback(
     (ref: any, state: TransformState) => {
       setTransformState(state);

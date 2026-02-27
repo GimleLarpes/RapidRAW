@@ -22,6 +22,39 @@ interface SliderProps {
 
 const DOUBLE_CLICK_THRESHOLD_MS = 300;
 
+/**
+ * A controlled slider component with integrated numeric input, animated transitions, 
+ * and scroll-wheel support.
+ * @param {SliderProps} props - The properties for the Slider component.
+ * @param {number} [props.defaultValue=0] - The value the slider returns to when the label is clicked/double-clicked.
+ * @param {string | React.ReactNode} props.label - Display label or icon. If a string, clicking it triggers a reset.
+ * @param {number} props.max - Maximum selectable value.
+ * @param {number} props.min - Minimum selectable value.
+ * @param {(val: number) => void} props.onChange - Callback fired when the value changes via slider, input, or scroll.
+ * @param {(state: boolean) => void} [props.onDragStateChange] - Callback fired when dragging begins or ends.
+ * @param {number} props.step - The granularity of value increments. Also determines decimal precision in the numeric display.
+ * @param {number} props.value - The current controlled value of the slider.
+ * @param {string} [props.className] - Optional CSS classes for the container element.
+ * @param {string} [props.trackClassName] - Optional CSS classes for the slider track background.
+ * @param {boolean} [props.disabled=false] - Disables component.
+ * * @remarks
+ * - **Reset Behavior:** Clicking or double-clicking the text label or slider resets the slider to `defaultValue`.
+ * - **Scroll Support:** When the container is focused, `Shift + Wheel` increments/decrements the value by `step * 5`.
+ * - **Precision:** Decimal places in the numeric input are automatically derived from the `step` prop.
+ * - **Animation:** Includes an ease-in-out animation when the `value` prop changes programmatically (outside of active dragging).
+ * * @example
+ * ```tsx
+ * <Slider
+ * label="Opacity"
+ * min={0}
+ * max={1}
+ * step={0.01}
+ * value={opacity}
+ * defaultValue={1}
+ * onChange={(value) => setOpacity(Number(value))}
+ * />
+ * ```
+ */
 const Slider = ({
   defaultValue = 0,
   label,

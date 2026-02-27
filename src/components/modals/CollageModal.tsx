@@ -594,10 +594,10 @@ export default function CollageModal({ isOpen, onClose, onSave, sourceImages }: 
       </div>
 
       <div className="space-y-2">
-        <Slider label="Spacing" min={0} max={50} step={1} defaultValue={INITIAL_SPACING} value={spacing} onChange={e => setSpacing(Number(e.target.value))} />
+        <Slider label="Spacing" min={0} max={50} step={1} defaultValue={INITIAL_SPACING} value={spacing} onChange={value => setSpacing(value)} />
       </div>
       <div className="space-y-2">
-        <Slider label="Border Radius" min={0} max={50} step={1} defaultValue={INITIAL_BORDER_RADIUS} value={borderRadius} onChange={e => setBorderRadius(Number(e.target.value))} />
+        <Slider label="Border Radius" min={0} max={50} step={1} defaultValue={INITIAL_BORDER_RADIUS} value={borderRadius} onChange={value => setBorderRadius(value)} />
       </div>
 
       <div>

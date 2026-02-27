@@ -76,8 +76,8 @@ const ColorWheel = ({
     onChange({ ...effectiveValue, hue: color.hsva.h, saturation: color.hsva.s });
   };
 
-  const handleLumChange = (e: any) => {
-    onChange({ ...effectiveValue, luminance: parseFloat(e.target.value) });
+  const handleLumChange = (value: number) => {
+    onChange({ ...effectiveValue, luminance: value });
   };
 
   const handleReset = () => {

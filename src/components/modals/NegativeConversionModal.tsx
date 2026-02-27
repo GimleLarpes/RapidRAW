@@ -202,15 +202,15 @@ export default function NegativeConversionModal({
 
         <div className="space-y-3">
           <p className="text-sm font-semibold text-text-primary">Color Timing</p>
-          <Slider label="Red (Cyan)" value={params.red_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={e => handleParamChange('red_weight', Number(e.target.value))} />
-          <Slider label="Green (Magenta)" value={params.green_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={e => handleParamChange('green_weight', Number(e.target.value))} />
-          <Slider label="Blue (Yellow)" value={params.blue_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={e => handleParamChange('blue_weight', Number(e.target.value))} />
+          <Slider label="Red (Cyan)" value={params.red_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={value => handleParamChange('red_weight', value)} />
+          <Slider label="Green (Magenta)" value={params.green_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={value => handleParamChange('green_weight', value)} />
+          <Slider label="Blue (Yellow)" value={params.blue_weight} min={0.5} max={2.0} step={0.01} defaultValue={1} onChange={value => handleParamChange('blue_weight', value)} />
         </div>
 
         <div className="space-y-3">
           <p className="text-sm font-semibold text-text-primary">Print Grade</p>
-          <Slider label="Exposure" value={params.exposure} min={-2.0} max={2.0} step={0.05} defaultValue={0} onChange={e => handleParamChange('exposure', Number(e.target.value))} />
-          <Slider label="Contrast (Grade)" value={params.contrast} min={0.5} max={2.5} step={0.05} defaultValue={1} onChange={e => handleParamChange('contrast', Number(e.target.value))} />
+          <Slider label="Exposure" value={params.exposure} min={-2.0} max={2.0} step={0.05} defaultValue={0} onChange={value => handleParamChange('exposure', value)} />
+          <Slider label="Contrast (Grade)" value={params.contrast} min={0.5} max={2.5} step={0.05} defaultValue={1} onChange={value => handleParamChange('contrast', value)} />
         </div>
 
         <div className="mt-auto pt-4 space-y-2">

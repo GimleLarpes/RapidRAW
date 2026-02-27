@@ -116,8 +116,8 @@ const SUB_MASK_CONFIG: Record<Mask, any> = {
 
 const BrushTools = ({ settings, onSettingsChange }: { settings: any; onSettingsChange: any }) => (
   <div className="space-y-4 border-t border-surface">
-    <Slider defaultValue={100} label="Brush Size" max={200} min={1} onChange={(e: any) => onSettingsChange((s: any) => ({ ...s, size: Number(e.target.value) }))} step={1} value={settings.size} />
-    <Slider defaultValue={50} label="Brush Feather" max={100} min={0} onChange={(e: any) => onSettingsChange((s: any) => ({ ...s, feather: Number(e.target.value) }))} step={1} value={settings.feather} />
+    <Slider defaultValue={100} label="Brush Size" max={200} min={1} onChange={(value) => onSettingsChange((s: any) => ({ ...s, size: value }))} step={1} value={settings.size} />
+    <Slider defaultValue={50} label="Brush Feather" max={100} min={0} onChange={(value) => onSettingsChange((s: any) => ({ ...s, feather: value }))} step={1} value={settings.feather} />
     <div className="grid grid-cols-2 gap-2 pt-2">
       <button className={`p-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 ${settings.tool === ToolType.Brush ? 'text-primary bg-surface' : 'bg-surface text-text-secondary hover:bg-card-active'}`} onClick={() => onSettingsChange((s: any) => ({ ...s, tool: ToolType.Brush }))}>Brush</button>
       <button className={`p-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 ${settings.tool === ToolType.Eraser ? 'text-primary bg-surface' : 'bg-surface text-text-secondary hover:bg-card-active'}`} onClick={() => onSettingsChange((s: any) => ({ ...s, tool: ToolType.Eraser }))}>Eraser</button>
@@ -1191,7 +1191,7 @@ function SettingsPanel({ container, activeSubMask, aiModelDownloadStatus, brushS
                     label="Opacity" 
                     max={100} min={0} 
                     value={(isComponentMode ? activeSubMask.opacity : displayContainer.opacity) ?? 100} 
-                    onChange={(e: any) => isComponentMode ? updateSubMask(activeSubMask.id, { opacity: Number(e.target.value) }) : handleMaskPropertyChange('opacity', Number(e.target.value))} 
+                    onChange={(value) => isComponentMode ? updateSubMask(activeSubMask.id, { opacity: value }) : handleMaskPropertyChange('opacity', value)} 
                     step={1} 
                  />
 
@@ -1208,7 +1208,7 @@ function SettingsPanel({ container, activeSubMask, aiModelDownloadStatus, brushS
                         {subMaskConfig.parameters?.map((param: any) => (
                            <Slider key={param.key} label={param.label} min={param.min} max={param.max} step={param.step} defaultValue={param.defaultValue}
                               value={(activeSubMask.parameters[param.key] || 0) * (param.multiplier || 1)}
-                              onChange={(e: any) => handleSubMaskParameterChange(param.key, parseFloat(e.target.value) / (param.multiplier || 1))}
+                              onChange={(value) => handleSubMaskParameterChange(param.key, value / (param.multiplier || 1))}
                            />
                         ))}
                         {subMaskConfig.showBrushTools && brushSettings && <BrushTools settings={brushSettings} onSettingsChange={setBrushSettings} />}

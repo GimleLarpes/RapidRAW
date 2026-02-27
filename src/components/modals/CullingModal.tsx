@@ -164,8 +164,8 @@ export default function CullingModal({
                 step={1}
                 value={settings.similarityThreshold}
                 defaultValue={28}
-                onChange={(e) =>
-                  setSettings((s) => ({ ...s, similarityThreshold: Number(e.target.value) }))
+                onChange={(value) =>
+                  setSettings((s) => ({ ...s, similarityThreshold: value }))
                 }
               />
               <p className="text-xs text-text-secondary mt-1">
@@ -185,8 +185,8 @@ export default function CullingModal({
                 step={25}
                 value={settings.blurThreshold}
                 defaultValue={100.0}
-                onChange={(e) =>
-                  setSettings((s) => ({ ...s, blurThreshold: Number(e.target.value) }))
+                onChange={(value) =>
+                  setSettings((s) => ({ ...s, blurThreshold: value }))
                 }
               />
               <p className="text-xs text-text-secondary mt-1">

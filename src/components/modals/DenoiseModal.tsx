@@ -325,7 +325,7 @@ export default function DenoiseModal({
           max={100}
           step={1}
           defaultValue={50}
-          onChange={(e) => setIntensity(Number(e.target.value))}
+          onChange={(value) => setIntensity(value)}
           className="w-full"
           trackClassName="bg-bg-secondary"
           disabled={disabled}

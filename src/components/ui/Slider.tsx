@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { GLOBAL_KEYS } from './AppProperties';
 
 interface SliderProps {
   defaultValue?: number;
@@ -217,6 +218,17 @@ const Slider = ({
     }
   };
 
+  const handleRangeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.currentTarget.blur();
+      return;
+    }
+
+    if (GLOBAL_KEYS.includes(e.key)) {
+      e.currentTarget.blur();
+    }
+  };
+
   const textLabel = typeof label === 'string';
 
   return (
@@ -281,6 +293,7 @@ const Slider = ({
           max={String(max)}
           min={String(min)}
           onChange={handleChange}
+          onKeyDown={handleRangeKeyDown}
           onDoubleClick={handleReset}
           onPointerDown={handleDragStart}
           onPointerUp={handleDragEnd}

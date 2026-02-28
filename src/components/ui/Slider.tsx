@@ -94,7 +94,7 @@ const Slider = ({
       if (disabled || !event.shiftKey) return;
 
       event.preventDefault();
-      const direction = -Math.sign(event.deltaX);
+      const direction = -Math.sign(event.deltaY || event.deltaX);
       const newValue = value + direction * step * 5;
       const clampedValue = Math.max(min, Math.min(max, parseFloat(newValue.toFixed(decimalPlaces))));
 

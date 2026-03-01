@@ -344,7 +344,7 @@ export default function ColorPanel({
           min={-100}
           onChange={(value) => handleGlobalChange(ColorAdjustment.Temperature, value)}
           step={1}
-          value={adjustments.temperature || 0}
+          value={adjustments.temperature}
           onDragStateChange={onDragStateChange}
         />
         <Slider
@@ -353,7 +353,7 @@ export default function ColorPanel({
           min={-100}
           onChange={(value) => handleGlobalChange(ColorAdjustment.Tint, value)}
           step={1}
-          value={adjustments.tint || 0}
+          value={adjustments.tint}
           onDragStateChange={onDragStateChange}
         />
       </div>
@@ -366,7 +366,7 @@ export default function ColorPanel({
           min={-100}
           onChange={(value) => handleGlobalChange(ColorAdjustment.Vibrance, value)}
           step={1}
-          value={adjustments.vibrance || 0}
+          value={adjustments.vibrance}
           onDragStateChange={onDragStateChange}
         />
         <Slider
@@ -375,7 +375,7 @@ export default function ColorPanel({
           min={-100}
           onChange={(value) => handleGlobalChange(ColorAdjustment.Saturation, value)}
           step={1}
-          value={adjustments.saturation || 0}
+          value={adjustments.saturation}
           onDragStateChange={onDragStateChange}
         />
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import clsx from 'clsx';
 import { GLOBAL_KEYS } from './AppProperties';
 
 interface SliderProps {
@@ -18,7 +19,7 @@ interface SliderProps {
 const DOUBLE_CLICK_THRESHOLD_MS = 300;
 
 /**
- * A controlled slider component with integrated numeric input, animated transitions, 
+ * A controlled slider component with integrated numeric input, animated transitions,
  * and scroll-wheel support.
  * @param {SliderProps} props - The properties for the Slider component.
  * @param {number} [props.defaultValue=0] - The value the slider returns to when the label is clicked/double-clicked.
@@ -74,7 +75,7 @@ const Slider = ({
   const decimalPlaces = useMemo(() => {
     const stepStr = String(step);
     return stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
-  }, [step])
+  }, [step]);
 
   useEffect(() => {
     onDragStateChange(isDragging);
@@ -174,7 +175,7 @@ const Slider = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.valueAsNumber;
     setDisplayValue(val);
-    onChange(val)
+    onChange(val);
   };
 
   const handleDragStart = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
@@ -232,11 +233,14 @@ const Slider = ({
   const textLabel = typeof label === 'string';
 
   return (
-    <div className={`mb-2 ${className} ${disabled ? 'opacity-50' : ''}`} ref={containerRef}>
+    <div className={clsx('mb-2', className, { 'opacity-50': disabled })} ref={containerRef}>
       <div className="flex justify-between items-center mb-1">
         <button
           type="button"
-          className={`grid group/label justify-items-start ${textLabel ? (disabled ? 'disabled:cursor-not-allowed' : 'cursor-pointer') : 'cursor-default'}`}
+          className={clsx('grid group/label justify-items-start', {
+            'cursor-pointer disabled:cursor-not-allowed': textLabel,
+            'cursor-default': !textLabel,
+          })}
           aria-label={textLabel ? `Reset ${label}` : undefined}
           aria-hidden={!textLabel}
           disabled={disabled || !textLabel}
@@ -250,19 +254,19 @@ const Slider = ({
           </span>
           <span
             aria-hidden={true}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled || !textLabel? '' : 'group-hover/label:opacity-100'}`}
+            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled || !textLabel ? '' : 'group-hover/label:opacity-100'}`}
           >
             Reset
           </span>
         </button>
         <div className="w-12 text-right">
           <input
-            className={`w-full text-sm text-text-primary border transition-all duration-200 disabled:cursor-not-allowed 
-              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none 
-              ${isEditing
-                ? 'text-center bg-card-active border-gray-500 rounded px-1 py-0 outline-none focus:ring-1 focus:ring-blue-500 '
-                : 'text-right bg-transparent border-transparent select-none'
-            }`}
+            className={clsx(
+              'w-full px-1 py-0 text-sm text-text-primary border rounded transition-all duration-200 disabled:cursor-not-allowed',
+              '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+              'text-right bg-transparent border-transparent select-none',
+              'focus:text-center focus:bg-card-active focus:border-gray-500 focus:select-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+            )}
             max={max}
             min={min}
             onBlur={handleInputCommit}
@@ -271,7 +275,7 @@ const Slider = ({
             onFocus={() => !disabled && setIsEditing(true)}
             step={step}
             type="number"
-            value={isEditing ? inputValue :decimalPlaces > 0 && value === 0 ? '0' : value.toFixed(decimalPlaces)}
+            value={isEditing ? inputValue : decimalPlaces > 0 && value === 0 ? '0' : value.toFixed(decimalPlaces)}
             disabled={disabled}
             data-tooltip={disabled ? null : `Click to edit`}
           />
@@ -285,10 +289,12 @@ const Slider = ({
           }`}
         />
         <input
-          className={`absolute top-1/2 left-0 w-full h-1.5 appearance-none bg-transparent m-0 p-0 slider-input z-10 
-            ${isDragging ? 'slider-thumb-active' : ''} 
-            ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
-          `}
+          className={clsx(
+            'absolute top-1/2 left-0 w-full h-1.5 m-0 p-0 z-10 appearance-none bg-transparent slider-input cursor-pointer disabled:cursor-not-allowed',
+            {
+              'slider-thumb-active': isDragging,
+            },
+          )}
           style={{ margin: 0 }}
           max={String(max)}
           min={String(min)}

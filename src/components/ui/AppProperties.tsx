@@ -1,6 +1,5 @@
-import React from 'react';
 import { ExportPreset } from './ExportImportProperties';
-import { Adjustments, Color } from '../../utils/adjustments';
+import { Adjustments } from '../../utils/adjustments';
 import { ToolType } from '../panel/right/Masks';
 
 export const GLOBAL_KEYS = [' ', 'ArrowUp', 'ArrowDown', 'f', 'b', 'w'];
@@ -29,6 +28,7 @@ export enum Invokes {
   EstimateBatchExportSize = 'estimate_batch_export_size',
   EstimateExportSize = 'estimate_export_size',
   ExportImage = 'export_image',
+  FrontendLog = 'frontend_log',
   GenerateAiForegroundMask = 'generate_ai_foreground_mask',
   GenerateAiSkyMask = 'generate_ai_sky_mask',
   GenerateAiSubjectMask = 'generate_ai_subject_mask',

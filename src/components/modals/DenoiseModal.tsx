@@ -181,11 +181,10 @@ export default function DenoiseModal({
 }: DenoiseModalProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [show, setShow] = useState(false);
-  // Initializing at 50 (0-100 range) instead of 0.5 so the Slider displays integer percentages
-  const [intensity, setIntensity] = useState<number>(50);
+  const [intensity, setIntensity] = useState<number>(15);
   const [isSaving, setIsSaving] = useState(false);
   const [savedPath, setSavedPath] = useState<string | null>(null);
-  
+
   const mouseDownTarget = useRef<EventTarget | null>(null);
 
   useEffect(() => {
@@ -324,7 +323,7 @@ export default function DenoiseModal({
           min={0}
           max={100}
           step={1}
-          defaultValue={50}
+          defaultValue={15}
           onChange={(value) => setIntensity(value)}
           className="w-full"
           trackClassName="bg-bg-secondary"

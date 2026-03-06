@@ -1517,10 +1517,10 @@ function SettingsPanel({
             max={100}
             min={0}
             value={(isComponentMode ? activeSubMask.opacity : displayContainer.opacity) ?? 100}
-            onChange={(e: any) =>
+            onChange={(value) =>
               isComponentMode
-                ? updateSubMask(activeSubMask.id, { opacity: Number(e.target.value) })
-                : handleMaskPropertyChange('opacity', Number(e.target.value))
+                ? updateSubMask(activeSubMask.id, { opacity: value })
+                : handleMaskPropertyChange('opacity', value)
             }
             step={1}
           />
@@ -1544,9 +1544,7 @@ function SettingsPanel({
                   step={param.step}
                   defaultValue={param.defaultValue}
                   value={(activeSubMask.parameters[param.key] || 0) * (param.multiplier || 1)}
-                  onChange={(e: any) =>
-                    handleSubMaskParameterChange(param.key, parseFloat(e.target.value) / (param.multiplier || 1))
-                  }
+                  onChange={(value) => handleSubMaskParameterChange(param.key, value / (param.multiplier || 1))}
                 />
               ))}
               {subMaskConfig.showBrushTools && brushSettings && (

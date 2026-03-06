@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import clsx from 'clsx';
 import { GLOBAL_KEYS } from './AppProperties';
+import Text from './Text';
+import { TextColors, TextVariants } from '../../types/typography';
 
 interface SliderProps {
   defaultValue?: number;
@@ -47,7 +49,7 @@ const DOUBLE_CLICK_THRESHOLD_MS = 300;
  * step={0.01}
  * value={opacity}
  * defaultValue={1}
- * onChange={(value) => setOpacity(Number(value))}
+ * onChange={(value) => setOpacity(value)}
  * />
  * ```
  */
@@ -219,6 +221,14 @@ const Slider = ({
     }
   };
 
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!disabled) {
+      setIsEditing(true);
+      const target = e.currentTarget;
+      setTimeout(() => target.select(), 0);
+    }
+  };
+
   const handleRangeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.ctrlKey || e.metaKey) {
       e.currentTarget.blur();
@@ -246,18 +256,31 @@ const Slider = ({
           disabled={disabled || !textLabel}
           onClick={handleReset}
         >
-          <span
+          <Text
+            variant={TextVariants.label}
             aria-hidden={true}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-secondary select-none transition-opacity duration-200 ease-in-out opacity-100 ${disabled || !textLabel ? '' : 'group-hover/label:opacity-0'}`}
+            className={clsx(
+              'col-start-1 row-start-1 select-none transition-opacity duration-200 ease-in-out opacity-100',
+              {
+                'group-hover/label:opacity-0': !disabled && textLabel,
+              },
+            )}
           >
             {label}
-          </span>
-          <span
+          </Text>
+          <Text
+            variant={TextVariants.label}
+            color={TextColors.primary}
             aria-hidden={true}
-            className={`col-start-1 row-start-1 text-sm font-medium text-text-primary select-none transition-opacity duration-200 ease-in-out opacity-0 ${disabled || !textLabel ? '' : 'group-hover/label:opacity-100'}`}
+            className={clsx(
+              'col-start-1 row-start-1 select-none transition-opacity duration-200 ease-in-out opacity-0',
+              {
+                'group-hover/label:opacity-100': !disabled && textLabel,
+              },
+            )}
           >
             Reset
-          </span>
+          </Text>
         </button>
         <div className="w-12 text-right">
           <input
@@ -272,7 +295,7 @@ const Slider = ({
             onBlur={handleInputCommit}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            onFocus={() => !disabled && setIsEditing(true)}
+            onFocus={handleInputFocus}
             step={step}
             type="number"
             value={isEditing ? inputValue : decimalPlaces > 0 && value === 0 ? '0' : value.toFixed(decimalPlaces)}

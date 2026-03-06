@@ -109,7 +109,7 @@ const Dropdown = <T extends React.Key>({
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <Text as="span" variant={TextVariants.label} color={TextColors.primary}>
+        <Text as="span" color={TextColors.primary} weight={TextWeights.semibold}>
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
         <ChevronDown

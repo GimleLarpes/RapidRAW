@@ -285,6 +285,7 @@ fn default_tagging_shortcuts_option() -> Option<Vec<String>> {
         "event".to_string(),
     ])
 }
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
@@ -295,12 +296,16 @@ pub struct AppSettings {
     #[serde(default)]
     pub enable_zoom_hifi: Option<bool>,
     #[serde(default)]
+    pub high_res_zoom_multiplier: Option<f32>,
+    #[serde(default)]
     pub enable_live_previews: Option<bool>,
     #[serde(default)]
     pub enable_high_quality_live_previews: Option<bool>,
     pub sort_criteria: Option<SortCriteria>,
     pub filter_criteria: Option<FilterCriteria>,
     pub theme: Option<String>,
+    #[serde(default)]
+    pub font_family: Option<String>,
     pub transparent: Option<bool>,
     pub decorations: Option<bool>,
     #[serde(alias = "comfyuiAddress")]
@@ -368,10 +373,11 @@ impl Default for AppSettings {
             editor_preview_resolution: Some(1920),
             enable_zoom_hifi: Some(true),
             enable_live_previews: Some(true),
-            enable_high_quality_live_previews: Some(false),
+            enable_high_quality_live_previews: Some(true),
             sort_criteria: None,
             filter_criteria: None,
             theme: Some("dark".to_string()),
+            font_family: None,
             transparent: Some(true),
             #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
             decorations: Some(true),
@@ -402,6 +408,7 @@ impl Default for AppSettings {
             library_view_mode: Some("flat".to_string()),
             export_presets: default_export_presets(),
             my_lenses: Some(Vec::new()),
+            high_res_zoom_multiplier: Some(1.0),
             enable_folder_image_counts: Some(false),
             linear_raw_mode: default_linear_raw_mode(),
             enable_xmp_sync: Some(true),

@@ -28,6 +28,7 @@ interface EditorProps {
   finalPreviewUrl: string | null;
   isFullScreen: boolean;
   isLoading: boolean;
+  isSliderDragging: boolean;
   isMaskControlHovered: boolean;
   isStraightenActive: boolean;
   isRotationActive?: boolean;
@@ -39,7 +40,7 @@ interface EditorProps {
   onQuickErase(subMaskId: string | null, startPoint: Coord, endpoint: Coord): void;
   onRedo(): void;
   onSelectAiSubMask(id: string | null): void;
-  onSelectMask(id: string): void;
+  onSelectMask(id: string | null): void;
   onStraighten(val: number): void;
   onToggleFullScreen(): void;
   onToggleWaveform(): void;
@@ -60,7 +61,6 @@ interface EditorProps {
   onDisplaySizeChange?(size: any): void;
   onInitialFitScale?(scale: number): void;
   originalSize?: ImageDimensions;
-  isLoadingFullRes?: boolean;
   isWbPickerActive?: boolean;
   onWbPicked?: () => void;
   overlayMode?: OverlayMode;
@@ -83,6 +83,7 @@ export default function Editor({
   finalPreviewUrl,
   isFullScreen,
   isLoading,
+  isSliderDragging,
   isMaskControlHovered,
   isStraightenActive,
   isRotationActive,
@@ -114,7 +115,6 @@ export default function Editor({
   onDisplaySizeChange,
   onInitialFitScale,
   originalSize,
-  isLoadingFullRes,
   isWbPickerActive = false,
   onWbPicked,
   overlayMode = 'none',
@@ -233,7 +233,7 @@ export default function Editor({
     if (showOriginal) {
       setShowOriginal(false);
     }
-  }, [finalPreviewUrl, setShowOriginal]);
+  }, [adjustments, setShowOriginal]);
 
   const isCropping = activeRightPanel === Panel.Crop;
   const isMasking = activeRightPanel === Panel.Masks;
@@ -329,7 +329,16 @@ export default function Editor({
 
   const handleLiveMaskPreview = useCallback(
     (maskDef: any) => {
-      pendingOverlayRequestRef.current = { maskDef, renderSize: imageRenderSize };
+      let normalizedDef = maskDef;
+      if (maskDef && !maskDef.adjustments) {
+        normalizedDef = {
+          ...maskDef,
+          adjustments: {},
+          opacity: 100,
+        };
+      }
+
+      pendingOverlayRequestRef.current = { maskDef: normalizedDef, renderSize: imageRenderSize };
       processOverlayQueue();
     },
     [imageRenderSize, processOverlayQueue],
@@ -621,11 +630,15 @@ export default function Editor({
   const isPanningDisabled =
     isMaskHovered ||
     isCropping ||
-    (isMasking && (activeSubMask?.type === Mask.Brush || activeSubMask?.type === Mask.AiSubject)) ||
+    (isMasking &&
+      (activeSubMask?.type === Mask.Brush ||
+        activeSubMask?.type === Mask.AiSubject ||
+        activeSubMask?.parameters?.isInitialDraw)) ||
     (isAiEditing &&
       (activeSubMask?.type === Mask.Brush ||
         activeSubMask?.type === Mask.AiSubject ||
-        activeSubMask?.type === Mask.QuickEraser));
+        activeSubMask?.type === Mask.QuickEraser ||
+        activeSubMask?.parameters?.isInitialDraw));
 
   const waveFormData: WaveformData = waveform || { blue: [], green: [], height: 0, luma: [], red: [], width: 0 };
   const isZoomActionActive = !isCropping && !isMasking && !isAiEditing && !isWbPickerActive;
@@ -663,7 +676,6 @@ export default function Editor({
         <EditorToolbar
           canRedo={canRedo}
           canUndo={canUndo}
-          isFullScreenLoading={isLoadingFullRes ?? false}
           isLoading={isLoading}
           isWaveformVisible={isWaveformVisible}
           onBackToLibrary={onBackToLibrary}
@@ -674,7 +686,6 @@ export default function Editor({
           onUndo={onUndo}
           selectedImage={selectedImage}
           showOriginal={showOriginal}
-          isLoadingFullRes={isLoadingFullRes}
           showDateView={showExifDateView}
           onToggleDateView={() => setShowExifDateView((prev) => !prev)}
           adjustmentsHistory={adjustmentsHistory}
@@ -748,6 +759,7 @@ export default function Editor({
               isMasking={isMasking}
               isStraightenActive={isStraightenActive}
               isRotationActive={isRotationActive}
+              isSliderDragging={isSliderDragging}
               maskOverlayUrl={maskOverlayUrl}
               onGenerateAiMask={onGenerateAiMask}
               onLiveMaskPreview={handleLiveMaskPreview}

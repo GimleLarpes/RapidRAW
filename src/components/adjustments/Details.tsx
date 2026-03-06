@@ -1,6 +1,8 @@
 import Slider from '../ui/Slider';
 import { Adjustments, DetailsAdjustment } from '../../utils/adjustments';
 import { AppSettings } from '../ui/AppProperties';
+import Text from '../ui/Text';
+import { TextVariants } from '../../types/typography';
 
 interface DetailsPanelProps {
   adjustments: Adjustments;
@@ -24,10 +26,12 @@ export default function DetailsPanel({
   const adjustmentVisibility = appSettings?.adjustmentVisibility || {};
 
   return (
-    <div>
+    <div className="space-y-4">
       {adjustmentVisibility.sharpening !== false && (
-        <div className="mb-4 p-2 bg-bg-tertiary rounded-md">
-          <p className="text-md font-semibold mb-2 text-primary">Sharpening</p>
+        <div className="p-2 bg-bg-tertiary rounded-md">
+          <Text variant={TextVariants.heading} className="mb-2">
+            Sharpening
+          </Text>
           <Slider
             label="Sharpness"
             max={100}
@@ -42,7 +46,9 @@ export default function DetailsPanel({
 
       {adjustmentVisibility.presence !== false && (
         <div className="p-2 bg-bg-tertiary rounded-md">
-          <p className="text-md font-semibold mb-2 text-primary">Presence</p>
+          <Text variant={TextVariants.heading} className="mb-2">
+            Presence
+          </Text>
           <Slider
             label="Clarity"
             max={100}
@@ -87,7 +93,7 @@ export default function DetailsPanel({
       {/* Hide noise reduction to stop people from thinking it exists
       {adjustmentVisibility.noiseReduction !== false && (
         <div className="p-2 bg-bg-tertiary rounded-md">
-          <p className="text-md font-semibold mb-2 text-primary">Noise Reduction</p>
+          <Text variant={TextVariants.heading} className="mb-2">Noise Reduction</Text>
           <Slider
             label="Luminance"
             max={100}
@@ -109,15 +115,15 @@ export default function DetailsPanel({
       */}
 
       {adjustmentVisibility.chromaticAberration !== false && (
-        <div className="mt-4 p-2 bg-bg-tertiary rounded-md">
-          <p className="text-md font-semibold mb-2 text-primary">Chromatic Aberration</p>
+        <div className="p-2 bg-bg-tertiary rounded-md">
+          <Text variant={TextVariants.heading} className="mb-2">
+            Chromatic Aberration
+          </Text>
           <Slider
             label="Red/Cyan"
             max={100}
             min={-100}
-            onChange={(value) =>
-              handleAdjustmentChange(DetailsAdjustment.ChromaticAberrationRedCyan, value)
-            }
+            onChange={(value) => handleAdjustmentChange(DetailsAdjustment.ChromaticAberrationRedCyan, value)}
             step={1}
             value={adjustments.chromaticAberrationRedCyan}
             onDragStateChange={onDragStateChange}
@@ -126,9 +132,7 @@ export default function DetailsPanel({
             label="Blue/Yellow"
             max={100}
             min={-100}
-            onChange={(value) =>
-              handleAdjustmentChange(DetailsAdjustment.ChromaticAberrationBlueYellow, value)
-            }
+            onChange={(value) => handleAdjustmentChange(DetailsAdjustment.ChromaticAberrationBlueYellow, value)}
             step={1}
             value={adjustments.chromaticAberrationBlueYellow}
             onDragStateChange={onDragStateChange}

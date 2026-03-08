@@ -184,7 +184,7 @@ interface DenoiseModalState {
 
 interface NegativeConversionModalState {
   isOpen: boolean;
-  targetPath: string | null;
+  targetPaths: Array<string>;
 }
 
 interface CullingModalState {
@@ -282,6 +282,7 @@ function App() {
   });
   const [isSliderDragging, setIsSliderDragging] = useState(false);
   const dragIdleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevAdjustmentsRef = useRef<{ path: string; adjustments: Adjustments } | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isAnimatingTheme, setIsAnimatingTheme] = useState(false);
   const isInitialThemeMount = useRef(true);
@@ -381,7 +382,7 @@ function App() {
   });
   const [negativeModalState, setNegativeModalState] = useState<NegativeConversionModalState>({
     isOpen: false,
-    targetPath: null,
+    targetPaths: [],
   });
   const [denoiseModalState, setDenoiseModalState] = useState<DenoiseModalState>({
     isOpen: false,
@@ -1253,7 +1254,7 @@ function App() {
 
           setFinalPreviewUrl((prevUrl) => {
             if (prevUrl && prevUrl.startsWith('blob:')) {
-              setTimeout(() => URL.revokeObjectURL(prevUrl), 250);
+              setTimeout(() => URL.revokeObjectURL(prevUrl), 200);
             }
             return url;
           });
@@ -2326,7 +2327,9 @@ function App() {
     const sharpnessFactor = 1.15;
     const zoomMultiplier = appSettings?.highResZoomMultiplier || 1.0;
 
-    let targetRes = Math.max(displaySize.width, displaySize.height) * dpr * sharpnessFactor * zoomMultiplier;
+    const effectiveDpr = appSettings?.useFullDpiRendering ? dpr : 1;
+
+    let targetRes = Math.max(displaySize.width, displaySize.height) * effectiveDpr * sharpnessFactor * zoomMultiplier;
     targetRes = Math.max(targetRes, 512);
 
     if (originalSize && originalSize.width > 0 && originalSize.height > 0) {
@@ -2346,6 +2349,7 @@ function App() {
     appSettings?.enableZoomHifi,
     appSettings?.editorPreviewResolution,
     appSettings?.highResZoomMultiplier,
+    appSettings?.useFullDpiRendering,
     displaySize.width,
     displaySize.height,
     originalSize,
@@ -2411,6 +2415,25 @@ function App() {
         currentResRef.current = targetRes;
         applyAdjustments(adjustments, false, targetRes);
         debouncedSave(selectedImage.path, adjustments);
+
+        const otherPaths = multiSelectedPaths.filter((p) => p !== selectedImage.path);
+        if (otherPaths.length > 0) {
+          const prev = prevAdjustmentsRef.current;
+          if (prev && prev.path === selectedImage.path) {
+            const delta: Partial<Adjustments> = {};
+            for (const key of Object.keys(adjustments) as Array<keyof Adjustments>) {
+              if (JSON.stringify(adjustments[key]) !== JSON.stringify(prev.adjustments[key])) {
+                (delta as any)[key] = adjustments[key];
+              }
+            }
+            if (Object.keys(delta).length > 0) {
+              invoke(Invokes.ApplyAdjustmentsToPaths, { paths: otherPaths, adjustments: delta }).catch((err) => {
+                console.error('Failed to apply adjustments to multi-selection:', err);
+              });
+            }
+          }
+        }
+        prevAdjustmentsRef.current = { path: selectedImage.path, adjustments };
       }, 50);
     }
 
@@ -2423,6 +2446,7 @@ function App() {
     selectedImage?.path,
     selectedImage?.isReady,
     isSliderDragging,
+    multiSelectedPaths,
     applyAdjustments,
     debouncedSave,
     appSettings?.enableLivePreviews,
@@ -3606,7 +3630,7 @@ function App() {
               if (selectedImage) {
                 setNegativeModalState({
                   isOpen: true,
-                  targetPath: selectedImage.path,
+                  targetPaths: [selectedImage.path],
                 });
               }
             },
@@ -3787,7 +3811,8 @@ function App() {
     const renameLabel = isSingleSelection ? 'Rename Image' : `Rename ${selectionCount} Images`;
     const cullLabel = isSingleSelection ? 'Cull Image' : `Cull Images`;
     const collageLabel = isSingleSelection ? 'Frame Image' : 'Create Collage';
-    const stitchLabel = `Stitch Panorama`;
+    const stitchLabel = 'Stitch Panorama';
+    const conversionLabel = 'Convert Negative';
     const mergeLabel = `Merge to HDR`;
 
     const handleCreateVirtualCopy = async (sourcePath: string) => {
@@ -3929,13 +3954,13 @@ function App() {
             },
           },
           {
-            label: 'Convert Negative',
+            label: conversionLabel,
             icon: Film,
-            disabled: !isSingleSelection,
+            disabled: selectionCount === 0,
             onClick: () => {
               setNegativeModalState({
                 isOpen: true,
-                targetPath: finalSelection[0],
+                targetPaths: finalSelection,
               });
             },
           },
@@ -4878,11 +4903,11 @@ function App() {
       <NegativeConversionModal
         isOpen={negativeModalState.isOpen}
         onClose={() => setNegativeModalState((prev) => ({ ...prev, isOpen: false }))}
-        selectedImagePath={negativeModalState.targetPath}
-        onSave={(savedPath) => {
+        targetPaths={negativeModalState.targetPaths}
+        onSave={(savedPaths) => {
           refreshImageList().then(() => {
-            if (selectedImage?.path === negativeModalState.targetPath) {
-              handleImageSelect(savedPath);
+            if (selectedImage && negativeModalState.targetPaths.includes(selectedImage.path) && savedPaths.length > 0) {
+              handleImageSelect(savedPaths[0]);
             }
           });
         }}

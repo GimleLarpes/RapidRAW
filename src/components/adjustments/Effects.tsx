@@ -70,15 +70,17 @@ export default function EffectsPanel({
           onDragStateChange={onDragStateChange}
         />
 
-        <Slider
-          label="Light Flares"
-          max={100}
-          min={0}
-          onChange={(value) => handleAdjustmentChange(CreativeAdjustment.FlareAmount, value)}
-          step={1}
-          value={adjustments.flareAmount}
-          onDragStateChange={onDragStateChange}
-        />
+        {!isForMask && (
+          <Slider
+            label="Light Flares"
+            max={100}
+            min={0}
+            onChange={(value) => handleAdjustmentChange(CreativeAdjustment.FlareAmount, value)}
+            step={1}
+            value={adjustments.flareAmount}
+            onDragStateChange={onDragStateChange}
+          />
+        )}
       </div>
 
       {!isForMask && (
